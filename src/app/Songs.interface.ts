@@ -1,5 +1,5 @@
 export interface ISongs{
-    id: Number,
-    Name: String,
-    Album: String
+    name: String,
+    isSelected: boolean
 }
+

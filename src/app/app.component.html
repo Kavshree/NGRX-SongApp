@@ -1,7 +1,7 @@
 <div>
-  Redux
-  <ul>
-    <li *ngFor="let i of songList">{{ i.id }}</li>
-  </ul>
-  <button (click)="addSong()">add song</button>
+
+  <h3 class="green-font">Total Number of songs : {{totalSongs}}</h3>
+  <hr/>
+<song-list (playListChange)='playListChangeParent($event)' (totalSongsEvent)='totalSongsEvent($event)' ></song-list>
+<play-list [playList]="playList"></play-list>
 </div>
