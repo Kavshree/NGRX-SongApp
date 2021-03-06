@@ -1,65 +1,79 @@
-import { Component, Output, EventEmitter } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { ISongs } from './Songs.interface'
-import { ADDSONG } from './actions'
+import { Component, Output, EventEmitter, OnInit } from "@angular/core";
+import { Observable } from "rxjs";
+import { Store } from "@ngrx/store";
+import { saveSongToChecklist } from "./actions";
+import { State } from "./reducer";
+
+export interface JobStatus {
+  status: string;
+  ordersReadyForChecklist: PersonChecklist[];
+}
+
+export interface PersonChecklist {
+  songName: string;
+  isChecked: boolean;
+}
 
 @Component({
-    selector: 'song-list',
-    template: `<section>
-    <h4 class="text-pink">Add songs to your playlist</h4>
-       <ul>
-            <li *ngFor="let s of songListArray">
-            <input type="checkbox" [(ngModel)]="s.isSelected" />
-                {{s.name}}
-            </li>
-       </ul>
-       <div>
-           <button (click)="addToPlayList()"> Add to playlist</button>
-           
-       </div>
-       <div>
-        Enter a new song:
-            <input type="text" [(ngModel)]="newsongName"/>
-            <button (click)="addSong()"> Add new song</button>
-        </div>
-        <hr>
-    </section>`,
-    styles: [`
-    .text-pink{color:#ed05ce}
-    ul li{list-style-type:none;}
-    `]
-    
+  selector: "song-list",
+  template: `
+    <section>
+      <input type="text" placeholder="Name" #nameInput />
+      <button (click)="onSubmit(nameInput.value)">Add song</button>
+
+      <br />
+
+      <ul>
+        <li *ngFor="let item of jobStatus.ordersReadyForChecklist">
+          <input
+            type="checkbox"
+            [checked]="item.isChecked"
+            #checkInput
+            (change)="checkToggle($event, item)"
+          />
+          {{ item.songName }}
+        </li>
+      </ul>
+
+      <button (click)="addToPlayList()">add to playlist</button>
+    </section>
+  `
 })
-
 export class SongListComponent {
-    songs$ : Observable<[ISongs]>;
-    songList;newsongName;
-    songListArray = [{name: "Song1", "isSelected": false},{name: "Song2", "isSelected": false},{name: "Song3", "isSelected": false}];
-    songsSelected=[];
-    @Output() playListChange= new EventEmitter();
-    @Output() totalSongsEvent = new EventEmitter();
+  public jobStatus: JobStatus;
 
-    constructor(private _store: Store<{songsReducer}>) { 
-        this._store.select('songsReducer').pipe().subscribe(da => {console.log(da); this.songList = da});
+  @Output() playListChange = new EventEmitter();
+  @Output() totalSongsEvent = new EventEmitter();
+  songsSelected = [];
+
+  constructor(private store: Store<{ jobs: State }>) {}
+
+  onSubmit(songName: string) {
+    this.totalSongsEvent.emit(this.jobStatus.ordersReadyForChecklist.length);
+    this.store.dispatch(saveSongToChecklist({ songName: songName }));
+  }
+
+  ngOnInit() {
+    this.store.select("jobs").subscribe(x => {
+      console.log(x);
+      this.jobStatus = x.jobStatus;
+      this.totalSongsEvent.emit(this.jobStatus.ordersReadyForChecklist.length);
+    });
+  }
+
+  checkToggle($event, item) {
+    if ($event.target.checked) {
+      this.songsSelected.push(item.songName);
+    } else {
+      const index = this.songsSelected.indexOf(item.songName);
+      if (index > -1) {
+        this.songsSelected.splice(index, 1);
       }
-      ngOnInit() {
-        this.totalSongsEvent.emit(this.songListArray.length);
     }
-      addSong() {
-        let newSongObj = {name: "", "isSelected": false}
-        newSongObj.name = this.newsongName; 
-        this.songListArray.push(newSongObj);
-        this.newsongName = "";
-        this._store.dispatch(ADDSONG({newSong: this.songListArray }));
-        this.totalSongsEvent.emit(this.songListArray.length);
-        //this._store.dispatch(ADDSONG({newSong: [{"id":420,"Name":"fdfdfdf","Adfdflbum":"dfdf"}] }))
-      }
-      addToPlayList() {
-        this.songsSelected = []
-        this.songsSelected = this.songListArray.filter((f) => f.isSelected)
-        this.playListChange.emit(this.songsSelected)
-        console.log(this.songsSelected)
-      }
+  }
 
+  addToPlayList() {
+    this.playListChange.emit(this.songsSelected);
+    console.log(this.songsSelected);
+  }
 }

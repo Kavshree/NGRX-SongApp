@@ -1,15 +1,40 @@
-import { state } from '@angular/animations';
-import { createReducer, on } from '@ngrx/store';
-import {ADDSONG } from './actions';
-import { ISongs } from './Songs.interface'
+import { createReducer, on, Action } from "@ngrx/store";
+import { saveSongToChecklist } from "./actions";
+import { JobStatus } from "./app.component";
 
-export const initialSongs : Array<ISongs> = [{name: "Song1", "isSelected": false},{name: "Song2", "isSelected": false},{name: "Song3", "isSelected": false}];
+export interface State {
+  jobStatus: JobStatus;
+}
 
-export const Songreducer = createReducer(initialSongs,
-    on(ADDSONG, (state, {newSong}) => [...state, ...newSong] )   
-)
+const initialState: State = {
+  jobStatus: {
+    status: "Pending",
+    ordersReadyForChecklist: [
+      {
+        songName: "default",
+        isChecked: false
+      }
+    ]
+  }
+};
 
+const jobStatusre = createReducer(
+  initialState,
+  on(saveSongToChecklist, (state, action) => ({
+    ...state,
+    jobStatus: {
+      ...state.jobStatus,
+      ordersReadyForChecklist: [
+        ...state.jobStatus.ordersReadyForChecklist,
+        {
+            songName: action.songName,
+          isChecked: false
+        }
+      ]
+    }
+  }))
+);
 
-export function reducer(store, action) {
-    return Songreducer(store, action)
+export function reducer(state: State | undefined, action: Action) {
+  return jobStatusre(state, action);
 }

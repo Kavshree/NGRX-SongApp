@@ -1,4 +1,8 @@
 import { createAction, props } from '@ngrx/store';
-import { ISongs } from './Songs.interface'
 
-export const ADDSONG = createAction('ADDSONG',props<{newSong}>() )
+export const saveSongToChecklist = createAction(
+    '[PERSON_API] Save person to checklist array',
+    props<{
+        songName: string;
+    }>()
+);

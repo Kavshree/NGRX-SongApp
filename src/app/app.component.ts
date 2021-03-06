@@ -1,22 +1,40 @@
-import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
-import { Store } from '@ngrx/store';
-import { ISongs } from './Songs.interface'
-import { ADDSONG } from './actions'
+import { Component } from "@angular/core";
+import { Store } from "@ngrx/store";
+import { Observable } from "rxjs";
+import { saveSongToChecklist } from "./actions";
+
+import { State } from "./reducer";
+
+export interface JobStatus {
+  status: string;
+  ordersReadyForChecklist: PersonChecklist[];
+}
+
+export interface PersonChecklist {
+  songName: string;
+  isChecked: boolean;
+}
 
 @Component({
-  selector: 'app-root',
-  templateUrl: './app.component.html',
+  selector: "my-app",
+  templateUrl: "./app.component.html",
   styles: [
-    `.red-font{color:red}
-    .green-font{color:green}`
- ]
+    `
+      .red-font {
+        color: red;
+      }
+      .green-font {
+        color: green;
+      }
+    `
+  ]
 })
 export class AppComponent {
-  playList=[]; totalSongs;
+  playList = [];
+  totalSongs;
   playListChangeParent(e) {
     this.playList = e;
-    console.log(this.playList)
+    console.log(this.playList);
   }
   totalSongsEvent(e) {
     this.totalSongs = e;

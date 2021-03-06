@@ -1,5 +1,6 @@
 export interface ISongs{
-    name: String,
-    isSelected: boolean
+    Songname: String,
+    isSelected: boolean,
 }
+
 

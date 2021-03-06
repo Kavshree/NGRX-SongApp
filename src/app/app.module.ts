@@ -1,24 +1,25 @@
-import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule } from "@angular/core";
+import { BrowserModule } from "@angular/platform-browser";
+import { FormsModule } from "@angular/forms";
+import { StoreModule } from "@ngrx/store";
 
-import { SongListComponent } from './songList.component'
-import { MyPlayListComponent } from './MyPlayList.component';
-import { FormsModule } from '@angular/forms';
+import { AppComponent } from "./app.component";
+import { SongListComponent } from "./songList.component";
+import { MyPlayListComponent } from "./MyPlayList.component";
 
-import { StoreModule } from '@ngrx/store'
-import { reducer } from './reducer';
-
-import { AppComponent } from './app.component';
+import * as fromRed from "./reducer";
 
 @NgModule({
-  declarations: [
-    AppComponent, SongListComponent, MyPlayListComponent
-  ],
   imports: [
-    BrowserModule,FormsModule,
-    StoreModule.forRoot({songsReducer : reducer})
+    BrowserModule,
+    FormsModule,
+    StoreModule.forRoot({ jobs: fromRed.reducer })
   ],
-  providers: [],
+  declarations: [
+    AppComponent,
+    SongListComponent,
+    MyPlayListComponent
+  ],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {}
