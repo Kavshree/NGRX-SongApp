@@ -35,7 +35,7 @@ export interface PersonChecklist {
         </li>
       </ul>
 
-      <button (click)="addToPlayList()">add to playlist</button>
+      <button (click)="addToPlayList()" [disabled]="isAddtoPlayDisabled">add to playlist</button>
     </section>
   `
 })
@@ -44,7 +44,7 @@ export class SongListComponent {
 
   @Output() playListChange = new EventEmitter();
   @Output() totalSongsEvent = new EventEmitter();
-  songsSelected = [];
+  songsSelected = []; isAddtoPlayDisabled=true;
 
   constructor(private store: Store<{ jobs: State }>) {}
 
@@ -70,6 +70,7 @@ export class SongListComponent {
         this.songsSelected.splice(index, 1);
       }
     }
+    this.isAddtoPlayDisabled = this.songsSelected.length > 0 ? false : true;
   }
 
   addToPlayList() {
